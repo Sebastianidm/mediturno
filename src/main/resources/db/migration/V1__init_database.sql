@@ -36,7 +36,7 @@ CREATE TABLE usuario_roles(
 --4. Tabla de disponibilidad médica (Agenda)
 CREATE TABLE agendas_medicas (
     id BIGSERIAL PRIMARY KEY,
-    medico_id BIGNIT NOT NULL,
+    medico_id BIGINT NOT NULL,
     fecha DATE NOT NULL,
     hora_inicio TIME NOT NULL,
     hora_fin TIME NOT NULL,
