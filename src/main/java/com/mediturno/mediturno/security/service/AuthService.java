@@ -8,6 +8,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import com.mediturno.mediturno.exception.UserAlreadyExistsException;
 
 import com.mediturno.mediturno.modules.user.model.Rol;
 import com.mediturno.mediturno.modules.user.model.Usuario;
@@ -36,10 +38,11 @@ public class AuthService {
         this.authenticationManager = authenticationManager;
     }
 
+    @Transactional
     public AuthResponse registrar(RegistroRequest request){
 
       if( usuarioRepository.existsByEmail(request.email())) {
-        throw new RuntimeException("El correo ya está registrado");
+        throw new UserAlreadyExistsException("El correo ya está registrado");
       }
 
       Rol rolPaciente = rolRepository.findByNombre("ROLE_PACIENTE")

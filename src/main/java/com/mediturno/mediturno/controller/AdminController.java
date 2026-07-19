@@ -8,6 +8,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import com.mediturno.mediturno.exception.ErrorResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 
 @RestController
 @RequestMapping("/api/v1/admin")
@@ -20,6 +26,19 @@ public class AdminController {
         this.adminService = adminService;
     }
 
+    @Operation(summary = "Registrar un nuevo médico", description = "Permite a un usuario con rol ADMIN registrar a un nuevo médico en el sistema.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Médico registrado exitosamente",
+                     content = @Content(schema = @Schema(implementation = AuthResponse.class))),
+        @ApiResponse(responseCode = "400", description = "Datos de entrada inválidos o error de validación",
+                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(responseCode = "401", description = "No autorizado - Token JWT ausente o inválido",
+                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(responseCode = "403", description = "Acceso prohibido - Se requiere rol ADMIN",
+                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+        @ApiResponse(responseCode = "409", description = "Conflicto - El correo electrónico ya está registrado",
+                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @PostMapping("/medicos")
     public ResponseEntity<AuthResponse> registrarMedico(@Valid @RequestBody RegistroMedicoRequest request) {
         AuthResponse respuesta = adminService.registrarMedico(request);

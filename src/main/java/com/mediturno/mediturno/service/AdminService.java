@@ -10,6 +10,7 @@ import com.mediturno.mediturno.security.jwt.JwtService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.mediturno.mediturno.exception.UserAlreadyExistsException;
 
 @Service
 public class AdminService {
@@ -29,7 +30,7 @@ public class AdminService {
     @Transactional
     public AuthResponse registrarMedico(RegistroMedicoRequest request) {
         if (usuarioRepository.existsByEmail(request.email())) {
-            throw new RuntimeException("El correo ya está registrado");
+            throw new UserAlreadyExistsException("El correo ya está registrado");
         }
 
         Rol rolMedico = rolRepository.findByNombre("ROLE_MEDICO")
