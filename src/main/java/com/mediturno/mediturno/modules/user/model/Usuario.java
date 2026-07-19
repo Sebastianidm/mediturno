@@ -30,6 +30,9 @@ public class Usuario {
     @Column(nullable = false, length = 255)
     private String password;
 
+    @Column(length = 100)
+    private String especialidad;
+
     @Builder.Default
     private Boolean activo = true;
 

@@ -9,7 +9,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.mediturno.mediturno.modules.user.model.Rol;
 import com.mediturno.mediturno.modules.user.model.Usuario;
+import com.mediturno.mediturno.modules.user.repository.RolRepository;
 import com.mediturno.mediturno.modules.user.repository.UsuarioRepository;
 
 import com.mediturno.mediturno.security.dto.AuthResponse;
@@ -22,13 +24,13 @@ public class AuthService {
 
     private final PasswordEncoder passwordEncoder;
     private final UsuarioRepository usuarioRepository;
+    private final RolRepository rolRepository;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
-
-
-    public AuthService(AuthenticationManager authenticationManager, JwtService jwtService, UsuarioRepository usuarioRepository,  PasswordEncoder passwordEncoder){
+    public AuthService(AuthenticationManager authenticationManager, JwtService jwtService, UsuarioRepository usuarioRepository, RolRepository rolRepository, PasswordEncoder passwordEncoder){
         this.usuarioRepository = usuarioRepository;
+        this.rolRepository = rolRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
@@ -39,10 +41,15 @@ public class AuthService {
       if( usuarioRepository.existsByEmail(request.email())) {
         throw new RuntimeException("El correo ya está registrado");
       }
+
+      Rol rolPaciente = rolRepository.findByNombre("ROLE_PACIENTE")
+              .orElseThrow(() -> new RuntimeException("Rol ROLE_PACIENTE no encontrado"));
+
       Usuario nuevoUsuario = new Usuario();
       nuevoUsuario.setEmail(request.email());
       nuevoUsuario.setNombre(request.nombre());
       nuevoUsuario.setApellido(request.apellido());
+      nuevoUsuario.getRoles().add(rolPaciente);
 
       String passwordEncriptada = passwordEncoder.encode(request.password());
       nuevoUsuario.setPassword(passwordEncriptada);
