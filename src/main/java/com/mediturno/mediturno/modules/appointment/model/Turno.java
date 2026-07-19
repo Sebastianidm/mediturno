@@ -34,6 +34,12 @@ public class Turno {
     @Column(columnDefinition = "TEXT")
     private String observaciones;
 
+    @org.hibernate.annotations.CreationTimestamp
+    @Column(name = "fecha_creacion", updatable = false)
+    private java.time.LocalDateTime fechaCreacion;
 
+    @org.hibernate.annotations.UpdateTimestamp
+    @Column(name = "fecha_actualizacion")
+    private java.time.LocalDateTime fechaActualizacion;
     
 }

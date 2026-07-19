@@ -35,4 +35,12 @@ public class AgendaMedica {
 
     @Builder.Default
     private Boolean disponible = true;
+
+    @org.hibernate.annotations.CreationTimestamp
+    @Column(name = "fecha_creacion", updatable = false)
+    private java.time.LocalDateTime fechaCreacion;
+
+    @org.hibernate.annotations.UpdateTimestamp
+    @Column(name = "fecha_actualizacion")
+    private java.time.LocalDateTime fechaActualizacion;
 }

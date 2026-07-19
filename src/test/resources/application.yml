@@ -10,3 +10,6 @@ spring:
       ddl-auto: update
   flyway:
     enabled: true
+  mail:
+    host: localhost
+    port: 3025
