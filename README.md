@@ -55,7 +55,7 @@ graph TD
     Controller --> |DTOs / Validaciones| Service[Capa Service / Reglas de Negocio]
     Service --> |Entidades JPA| Repository[Capa Repository / Spring Data JPA]
     Repository --> |SQL / JDBC| Database[(PostgreSQL / H2 Memory)]
-    Service -. --> |Notificaciones Asincronas @Async| Email[Email Notifier / Mailtrap SMTP]
+    Service -.-> |"Notificaciones Asincronas @Async"| Email[Email Notifier / Mailtrap SMTP]
 ```
 
 ---
