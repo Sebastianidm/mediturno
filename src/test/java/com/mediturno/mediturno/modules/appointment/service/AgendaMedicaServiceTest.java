@@ -130,9 +130,9 @@ class AgendaMedicaServiceTest {
         AgendaMedica agenda = AgendaMedica.builder().id(10L).medico(medico).fecha(fecha).horaInicio(LocalTime.of(9, 0)).horaFin(LocalTime.of(10, 0)).disponible(true).build();
         Page<AgendaMedica> page = new PageImpl<>(Collections.singletonList(agenda));
         
-        when(agendaMedicaRepository.findByFechaAndMedicoIdAndDisponibleTrue(fecha, 1L, pageable)).thenReturn(page);
+        when(agendaMedicaRepository.findSlotsLibres(fecha, 1L, null, pageable)).thenReturn(page);
 
-        Page<AgendaResponse> responsePage = agendaMedicaService.obtenerSlotsLibres(fecha, 1L, pageable);
+        Page<AgendaResponse> responsePage = agendaMedicaService.obtenerSlotsLibres(fecha, 1L, null, pageable);
 
         assertNotNull(responsePage);
         assertEquals(1, responsePage.getContent().size());
@@ -147,9 +147,9 @@ class AgendaMedicaServiceTest {
         AgendaMedica agenda = AgendaMedica.builder().id(10L).medico(medico).fecha(fecha).horaInicio(LocalTime.of(9, 0)).horaFin(LocalTime.of(10, 0)).disponible(true).build();
         Page<AgendaMedica> page = new PageImpl<>(Collections.singletonList(agenda));
         
-        when(agendaMedicaRepository.findByFechaAndDisponibleTrue(fecha, pageable)).thenReturn(page);
+        when(agendaMedicaRepository.findSlotsLibres(fecha, null, null, pageable)).thenReturn(page);
 
-        Page<AgendaResponse> responsePage = agendaMedicaService.obtenerSlotsLibres(fecha, null, pageable);
+        Page<AgendaResponse> responsePage = agendaMedicaService.obtenerSlotsLibres(fecha, null, null, pageable);
 
         assertNotNull(responsePage);
         assertEquals(1, responsePage.getContent().size());
@@ -162,9 +162,9 @@ class AgendaMedicaServiceTest {
         AgendaMedica agenda = AgendaMedica.builder().id(10L).medico(medico).fecha(LocalDate.now()).horaInicio(LocalTime.of(9, 0)).horaFin(LocalTime.of(10, 0)).disponible(true).build();
         Page<AgendaMedica> page = new PageImpl<>(Collections.singletonList(agenda));
         
-        when(agendaMedicaRepository.findByMedicoIdAndDisponibleTrue(1L, pageable)).thenReturn(page);
+        when(agendaMedicaRepository.findSlotsLibres(null, 1L, null, pageable)).thenReturn(page);
 
-        Page<AgendaResponse> responsePage = agendaMedicaService.obtenerSlotsLibres(null, 1L, pageable);
+        Page<AgendaResponse> responsePage = agendaMedicaService.obtenerSlotsLibres(null, 1L, null, pageable);
 
         assertNotNull(responsePage);
         assertEquals(1, responsePage.getContent().size());
@@ -177,9 +177,9 @@ class AgendaMedicaServiceTest {
         AgendaMedica agenda = AgendaMedica.builder().id(10L).medico(medico).fecha(LocalDate.now()).horaInicio(LocalTime.of(9, 0)).horaFin(LocalTime.of(10, 0)).disponible(true).build();
         Page<AgendaMedica> page = new PageImpl<>(Collections.singletonList(agenda));
         
-        when(agendaMedicaRepository.findByDisponibleTrue(pageable)).thenReturn(page);
+        when(agendaMedicaRepository.findSlotsLibres(null, null, null, pageable)).thenReturn(page);
 
-        Page<AgendaResponse> responsePage = agendaMedicaService.obtenerSlotsLibres(null, null, pageable);
+        Page<AgendaResponse> responsePage = agendaMedicaService.obtenerSlotsLibres(null, null, null, pageable);
 
         assertNotNull(responsePage);
         assertEquals(1, responsePage.getContent().size());

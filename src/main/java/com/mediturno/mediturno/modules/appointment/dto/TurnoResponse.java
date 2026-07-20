@@ -17,5 +17,6 @@ public record TurnoResponse(
     String medicoApellido,
     String estado,
     ZonedDateTime fechaReserva,
-    String observaciones
+    String observaciones,
+    String especialidad
 ) {}

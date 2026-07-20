@@ -1,5 +1,7 @@
 package com.mediturno.mediturno.controller;
 
+import com.mediturno.mediturno.modules.user.model.Usuario;
+import com.mediturno.mediturno.modules.user.repository.UsuarioRepository;
 import com.mediturno.mediturno.security.dto.AuthResponse;
 import com.mediturno.mediturno.security.dto.RegistroMedicoRequest;
 import com.mediturno.mediturno.service.AdminService;
@@ -14,6 +16,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/admin")
@@ -21,9 +24,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 public class AdminController {
 
     private final AdminService adminService;
+    private final UsuarioRepository usuarioRepository;
 
-    public AdminController(AdminService adminService) {
+    public AdminController(AdminService adminService, UsuarioRepository usuarioRepository) {
         this.adminService = adminService;
+        this.usuarioRepository = usuarioRepository;
     }
 
     @Operation(summary = "Registrar un nuevo médico", description = "Permite a un usuario con rol ADMIN registrar a un nuevo médico en el sistema.")
@@ -43,5 +48,11 @@ public class AdminController {
     public ResponseEntity<AuthResponse> registrarMedico(@Valid @RequestBody RegistroMedicoRequest request) {
         AuthResponse respuesta = adminService.registrarMedico(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(respuesta);
+    }
+
+    @GetMapping("/medicos")
+    @Operation(summary = "Listar médicos del sistema", description = "Permite a un administrador listar todos los médicos activos.")
+    public ResponseEntity<List<Usuario>> listarMedicosParaAdmin() {
+        return ResponseEntity.ok(usuarioRepository.findAllMedicosActivos());
     }
 }

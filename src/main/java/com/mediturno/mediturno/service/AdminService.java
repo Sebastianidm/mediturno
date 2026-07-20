@@ -47,7 +47,19 @@ public class AdminService {
         medico.getRoles().add(rolMedico);
         usuarioRepository.save(medico);
 
-        String token = jwtService.generateToken(medico.getEmail());
+        java.util.Map<String, Object> claims = new java.util.HashMap<>();
+        claims.put("id", medico.getId());
+        claims.put("nombre", medico.getNombre() + " " + medico.getApellido());
+        claims.put("email", medico.getEmail());
+
+        String rol = medico.getRoles().stream()
+                .map(Rol::getNombre)
+                .map(r -> r.startsWith("ROLE_") ? r.substring(5) : r)
+                .findFirst()
+                .orElse("MEDICO");
+        claims.put("rol", rol);
+
+        String token = jwtService.generateToken(medico.getEmail(), claims);
 
         return new AuthResponse(
                 token,

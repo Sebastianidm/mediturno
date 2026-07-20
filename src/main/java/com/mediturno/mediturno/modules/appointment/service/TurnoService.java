@@ -184,7 +184,8 @@ public class TurnoService {
                 turno.getAgenda().getMedico().getApellido(),
                 turno.getEstado().name(),
                 turno.getFechaReserva(),
-                turno.getObservaciones()
+                turno.getObservaciones(),
+                turno.getAgenda().getMedico().getEspecialidad()
         );
     }
 }

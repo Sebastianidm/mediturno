@@ -59,7 +59,7 @@ public class AuthService {
 
       usuarioRepository.save(nuevoUsuario);
 
-      String token = jwtService.generateToken(nuevoUsuario.getEmail());
+      String token = generateTokenWithClaims(nuevoUsuario);
 
       return new AuthResponse(
         token,
@@ -79,7 +79,7 @@ public class AuthService {
       Usuario usuario = usuarioRepository.findByEmail(request.email())
             .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
 
-      String token = jwtService.generateToken(usuario.getEmail());
+      String token = generateTokenWithClaims(usuario);
 
       return new AuthResponse(
         token,
@@ -91,5 +91,22 @@ public class AuthService {
       );
 
     }
+
+    private String generateTokenWithClaims(Usuario usuario) {
+        java.util.Map<String, Object> claims = new java.util.HashMap<>();
+        claims.put("id", usuario.getId());
+        claims.put("nombre", usuario.getNombre() + " " + usuario.getApellido());
+        claims.put("email", usuario.getEmail());
+
+        String rol = usuario.getRoles().stream()
+                .map(Rol::getNombre)
+                .map(r -> r.startsWith("ROLE_") ? r.substring(5) : r)
+                .findFirst()
+                .orElse("PACIENTE");
+        claims.put("rol", rol);
+
+        return jwtService.generateToken(usuario.getEmail(), claims);
+    }
+    
     
 }

@@ -51,7 +51,7 @@ class AgendaMedicaControllerTest {
     @Test
     void crearAgenda_Success() throws Exception {
         AgendaRequest request = new AgendaRequest(1L, LocalDate.now().plusDays(2), LocalTime.of(9, 0), LocalTime.of(10, 0));
-        AgendaResponse response = new AgendaResponse(10L, 1L, "Juan", "Pérez", request.fecha(), request.horaInicio(), request.horaFin(), true);
+        AgendaResponse response = new AgendaResponse(10L, 1L, "Juan", "Pérez", request.fecha(), request.horaInicio(), request.horaFin(), true, "Pediatría");
         
         when(agendaMedicaService.registrarAgenda(any(AgendaRequest.class))).thenReturn(response);
 
@@ -63,7 +63,7 @@ class AgendaMedicaControllerTest {
 
     @Test
     void listarSlotsLibres_Success() throws Exception {
-        when(agendaMedicaService.obtenerSlotsLibres(any(), any(), any()))
+        when(agendaMedicaService.obtenerSlotsLibres(any(), any(), any(), any()))
                 .thenReturn(new PageImpl<>(Collections.emptyList(), PageRequest.of(0, 10), 0));
 
         mockMvc.perform(get("/api/v1/agendas"))

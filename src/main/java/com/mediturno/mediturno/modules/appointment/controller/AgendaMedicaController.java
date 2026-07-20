@@ -58,8 +58,9 @@ public class AgendaMedicaController {
     public ResponseEntity<Page<AgendaResponse>> listarSlotsLibres(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha,
             @RequestParam(required = false) Long medicoId,
+            @RequestParam(required = false) String especialidad,
             Pageable pageable) {
-        Page<AgendaResponse> respuesta = agendaMedicaService.obtenerSlotsLibres(fecha, medicoId, pageable);
+        Page<AgendaResponse> respuesta = agendaMedicaService.obtenerSlotsLibres(fecha, medicoId, especialidad, pageable);
         return ResponseEntity.ok(respuesta);
     }
 }

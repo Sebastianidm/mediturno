@@ -64,19 +64,8 @@ public class AgendaMedicaService {
     }
 
     @Transactional(readOnly = true)
-    public Page<AgendaResponse> obtenerSlotsLibres(LocalDate fecha, Long medicoId, Pageable pageable) {
-        Page<AgendaMedica> page;
-
-        if (fecha != null && medicoId != null) {
-            page = agendaMedicaRepository.findByFechaAndMedicoIdAndDisponibleTrue(fecha, medicoId, pageable);
-        } else if (fecha != null) {
-            page = agendaMedicaRepository.findByFechaAndDisponibleTrue(fecha, pageable);
-        } else if (medicoId != null) {
-            page = agendaMedicaRepository.findByMedicoIdAndDisponibleTrue(medicoId, pageable);
-        } else {
-            page = agendaMedicaRepository.findByDisponibleTrue(pageable);
-        }
-
+    public Page<AgendaResponse> obtenerSlotsLibres(LocalDate fecha, Long medicoId, String especialidad, Pageable pageable) {
+        Page<AgendaMedica> page = agendaMedicaRepository.findSlotsLibres(fecha, medicoId, especialidad, pageable);
         return page.map(this::mapToResponse);
     }
 
@@ -89,7 +78,8 @@ public class AgendaMedicaService {
                 agenda.getFecha(),
                 agenda.getHoraInicio(),
                 agenda.getHoraFin(),
-                agenda.getDisponible()
+                agenda.getDisponible(),
+                agenda.getMedico().getEspecialidad()
         );
     }
 }

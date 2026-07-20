@@ -11,5 +11,6 @@ public record AgendaResponse(
     LocalDate fecha,
     LocalTime horaInicio,
     LocalTime horaFin,
-    Boolean disponible
+    Boolean disponible,
+    String especialidad
 ) {}

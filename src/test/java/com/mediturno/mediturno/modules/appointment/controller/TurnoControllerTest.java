@@ -78,7 +78,7 @@ class TurnoControllerTest {
     @Test
     void reservarTurno_Success() throws Exception {
         ReservaTurnoRequest request = new ReservaTurnoRequest(1L, "Consulta general");
-        TurnoResponse response = new TurnoResponse(1L, 2L, "Pedro", "Gómez", 1L, LocalDate.now(), LocalTime.of(9, 0), LocalTime.of(10, 0), "Marta", "Sánchez", "CONFIRMADO", ZonedDateTime.now(), "Consulta general");
+        TurnoResponse response = new TurnoResponse(1L, 2L, "Pedro", "Gómez", 1L, LocalDate.now(), LocalTime.of(9, 0), LocalTime.of(10, 0), "Marta", "Sánchez", "CONFIRMADO", ZonedDateTime.now(), "Consulta general", "Cardiología");
 
         when(turnoService.reservarTurno(any(ReservaTurnoRequest.class), eq("paciente@email.com"))).thenReturn(response);
 
@@ -90,7 +90,7 @@ class TurnoControllerTest {
 
     @Test
     void cancelarTurno_Success() throws Exception {
-        TurnoResponse response = new TurnoResponse(1L, 2L, "Pedro", "Gómez", 1L, LocalDate.now(), LocalTime.of(9, 0), LocalTime.of(10, 0), "Marta", "Sánchez", "CANCELADO", ZonedDateTime.now(), "Consulta general");
+        TurnoResponse response = new TurnoResponse(1L, 2L, "Pedro", "Gómez", 1L, LocalDate.now(), LocalTime.of(9, 0), LocalTime.of(10, 0), "Marta", "Sánchez", "CANCELADO", ZonedDateTime.now(), "Consulta general", "Cardiología");
         when(turnoService.cancelarTurno(eq(1L), eq("paciente@email.com"))).thenReturn(response);
 
         mockMvc.perform(post("/api/v1/turnos/1/cancelar"))

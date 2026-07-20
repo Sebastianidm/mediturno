@@ -34,11 +34,17 @@ public class JwtService {
 
     //Generar el Token
     public String generateToken(String userMail){
-        return Jwts.builder().subject(userMail).issuedAt(new Date(System.currentTimeMillis()))
-        .expiration(new Date(System.currentTimeMillis() + jwtExpiration))
-        .signWith(getSigningKey())
-        .compact();
+        return generateToken(userMail, new java.util.HashMap<>());
+    }
 
+    public String generateToken(String userMail, java.util.Map<String, Object> extraClaims) {
+        return Jwts.builder()
+                .claims(extraClaims)
+                .subject(userMail)
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + jwtExpiration))
+                .signWith(getSigningKey())
+                .compact();
     }
 
     //Extraer el username
