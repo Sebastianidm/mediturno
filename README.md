@@ -126,23 +126,44 @@ El proyecto requiere las siguientes variables de entorno para su correcto funcio
 
 ---
 
-## Endpoints de la API
-
+### Endpoints de la API
+ 
 ### Modulo de Autenticacion (Auth)
-- POST /api/v1/auth/register (Publico): Registra a un nuevo Paciente en el sistema.
-- POST /api/v1/auth/login (Publico): Autentica un usuario y devuelve el token de sesion JWT.
+- POST `/api/v1/auth/register` (Publico): Registra a un nuevo Paciente en el sistema.
+- POST `/api/v1/auth/login` (Publico): Autentica un usuario y devuelve el token de sesion JWT (con claims enriquecidos).
 
 ### Modulo de Administracion (Admin)
-- POST /api/v1/admin/medicos (ADMIN): Registra a un nuevo medico con sus respectivas especialidades.
+- POST `/api/v1/admin/medicos` (ADMIN): Registra a un nuevo medico con su especialidad, nombre, apellido y contraseña (devuelve token).
+- GET `/api/v1/admin/medicos` (ADMIN): Obtiene el listado completo de todos los medicos activos en el sistema para la creacion de agendas.
+
+### Modulo de Consultas Medicas (Medicos y Especialidades)
+- GET `/api/v1/medicos` (Publico): Busca y filtra medicos activos en el sistema por `nombre` o `especialidad` mediante query params.
+- GET `/api/v1/medicos/especialidades` (Publico): Devuelve la lista de especialidades unicas de los medicos cargados en el sistema.
 
 ### Modulo de Agendas medicas (Agenda)
-- POST /api/v1/agendas (ADMIN o MEDICO): Registra un nuevo bloque horario de disponibilidad medica.
-- GET /api/v1/agendas (Publico): Consulta de forma paginada los bloques horarios disponibles (slots libres).
+- POST `/api/v1/agendas` (ADMIN o MEDICO): Registra un nuevo bloque horario de disponibilidad medica.
+- GET `/api/v1/agendas` (Publico): Consulta de forma paginada y filtrable los bloques horarios disponibles (slots libres). Soporta filtrado dinamico opcional por `fecha`, `medicoId` y `especialidad` del lado del servidor.
 
 ### Modulo de Turnos (Turnos)
-- POST /api/v1/turnos (PACIENTE): Reserva un turno en base a un bloque de disponibilidad asignado.
-- POST /api/v1/turnos/{id}/cancelar (Autenticado): Cancela un turno activo (aplica reglas de anticipacion).
-- GET /api/v1/turnos/mis-turnos (Autenticado): Lista los turnos asociados al usuario logueado segun su rol (Pageable).
+- POST `/api/v1/turnos` (PACIENTE): Reserva un turno en base a un bloque de disponibilidad asignado (agendaId).
+- POST `/api/v1/turnos/{id}/cancelar` (Autenticado): Cancela un turno activo (aplica reglas de anticipacion y propiedad).
+- GET `/api/v1/turnos/mis-turnos` (Autenticado): Lista los turnos asociados al usuario logueado segun su rol (Pageable).
+
+---
+
+## Estructura del Token JWT Enriquecido
+
+Para facilitar el control de accesos y la visualización de la sesión del lado del cliente sin requerir peticiones adicionales de perfil, el backend inyecta los siguientes claims personalizados al generar el token JWT:
+```json
+{
+  "sub": "paciente@email.com",
+  "id": 1,
+  "nombre": "Pedro Gómez",
+  "email": "paciente@email.com",
+  "rol": "PACIENTE",
+  "exp": 1718876400
+}
+```
 
 ---
 
@@ -155,7 +176,7 @@ El backend de MediTurno implementa estrictamente las siguientes cuatro reglas fu
 2. Reserva Unica de Pacientes (Anti-solapamiento de Turnos):
    Un paciente no puede agendar un turno en el pasado ni reservar multiples citas confirmadas en el mismo rango horario de un mismo dia.
 3. Verificacion de Propiedad de Citas (Seguridad de Cancelacion):
-   Al cancelar un turno, si el usuario no es ADMIN ni MEDICO, se valida de forma prioritaria que el paciente autenticado sea el dueno legitimo de dicha cita (turno.paciente.id == usuarioAutenticado.id) antes de proceder con cualquier otra validacion de negocio.
+   Al cancelar un turno, si el usuario no es ADMIN ni MEDICO, se valida de forma prioritaria que el paciente autenticado sea el dueno legitimo de dicha cita (`turno.paciente.id == usuarioAutenticado.id`) antes de proceder con cualquier otra validacion de negocio.
 4. Politica de Limite de Cancelacion de Pacientes:
    Los pacientes solo pueden cancelar citas con una antelacion minima de 2 horas. Si la cita ocurre en menos de 2 horas, la operacion es rechazada. Medicos y administradores no tienen esta restriccion y pueden cancelar citas en cualquier momento.
 
@@ -164,12 +185,12 @@ El backend de MediTurno implementa estrictamente las siguientes cuatro reglas fu
 ## Cobertura de Tests
 
 El proyecto implementa una bateria de 26 pruebas automaticas robustas que validan de forma aislada tanto la capa de logica de negocio como los endpoints del controlador REST:
-- Tests Unitarios (JUnit 5 + Mockito): Validan que todas las validaciones de negocio en TurnoService y AgendaMedicaService funcionen al 100% bajo escenarios de exito y error.
+- Tests Unitarios (JUnit 5 + Mockito): Validan que todas las validaciones de negocio en `TurnoService` y `AgendaMedicaService` funcionen al 100% bajo escenarios de exito y error.
 - Tests de Integracion de Controlador (MockMvc Standalone): Validan respuestas HTTP, serializacion de DTOs en JSON y restricciones de acceso sin la sobrecarga del levantamiento completo del contexto de la base de datos externa.
 - Independencia en pruebas: La base de datos H2 en memoria y configuraciones de test aislan por completo las pruebas del entorno de desarrollo local.
 
 ### Cobertura de Codigo (JaCoCo)
-Mediante la ejecucion de ./mvnw verify, el plugin jacoco-maven-plugin genera reportes en target/site/jacoco/index.html asegurando que la cobertura de codigo cumpla y exceda el 80% minimo obligatorio de cobertura en ramas y lineas clave de logica medica.
+Mediante la ejecucion de `.\mvnw.cmd clean test` (en Windows) o `./mvnw verify`, el plugin `jacoco-maven-plugin` genera reportes en `target/site/jacoco/index.html` asegurando que la cobertura de codigo cumpla y exceda el 80% minimo obligatorio de cobertura en ramas y lineas clave de logica medica.
 
 ---
 
@@ -179,7 +200,7 @@ Mediante la ejecucion de ./mvnw verify, el plugin jacoco-maven-plugin genera rep
 Aunque las soluciones NoSQL ofrecen alta disponibilidad, el negocio de reserva de turnos requiere una consistencia estricta (ACID). El uso de PostgreSQL garantiza la integridad referencial, bloqueos consistentes y transacciones para evitar el problema de doble reserva (dos pacientes reservando el mismo slot al mismo tiempo). Introducir persistencia poliglotas aumentaria la complejidad de sincronizacion y consistencia eventual sin justificacion tecnica en esta fase.
 
 ### 2. Procesamiento Asincrono (@Async) para Notificaciones por Email
-El envio de correos HTML a traves de servidores SMTP externos (como Mailtrap) añade una latencia que oscila entre 300ms y 2 segundos. Si el envio se realizara de forma sincrona en el hilo de la peticion HTTP, el paciente experimentaria una API lenta. Con @Async, Spring delega el envio del email a un pool de hilos en segundo plano, devolviendo la respuesta HTTP de exito de manera inmediata.
+El envio de correos HTML a traves de servidores SMTP externos (como Mailtrap) añade una latencia que oscila entre 300ms y 2 segundos. Si el envio se realizara de forma sincrona en el hilo de la peticion HTTP, el paciente experimentaria una API lenta. Con `@Async`, Spring delega el envio del email a un pool de hilos en segundo plano, devolviendo la respuesta HTTP de exito de manera inmediata.
 
 ### 3. Paginacion Obligatoria (Pageable y Page)
 Los endpoints de consulta publica de disponibilidad medica y de turnos personales pueden retornar miles de registros a medida que la base de datos crece. La paginacion previene desbordamientos de memoria del servidor (Out Of Memory) y optimiza la velocidad de respuesta reduciendo el consumo de ancho de banda y la latencia de red.
@@ -189,5 +210,5 @@ Los endpoints de consulta publica de disponibilidad medica y de turnos personale
 ## Roadmap
 
 - Fase 7: Desarrollo y acoplamiento de un cliente Frontend web SPA dinamico utilizando React.js y TailwindCSS bajo los lineamientos esteticos modernos.
-- Fase 8: Desarrollo de la aplicacion movil nativa/hibrida para Pacientes y Medicos (planificada para el 4to semestre de la carrera).
+- Fase 8: Desarrollo de la aplicacion movil nativa/hibrida para Pacientes y Medicos.
 - Notificaciones Push: Integracion con Firebase Cloud Messaging (FCM) en el Roadmap Mobile.
